@@ -39,9 +39,30 @@ fun main(args: Array<String>) {
 
 ---
 
+# Strings
+
+In Java:
+
+```java
+String name = "Sophie"
+```
+
+In Kotlin:
+
+```kotlin
+val name: String = "Sophie"
+```
+
+---
+
 # Function types
 
 ```kotlin
+val camelCaseConverter: (String) -> String = { input ->
+    input.split("_")
+            .joinToString("") { it.capitalize() }
+            .decapitalize()
+}
 ```
 
 ---
@@ -56,15 +77,26 @@ fun main(args: Array<String>) {
 
 # Functions as black boxes
 
+// TODO: OmniGraffle diagram
+
 ---
 
 # What does lambda calculus look like in Kotlin syntax?
+
+```kotlin
+val camelCaseConverter: (String) -> String = { input ->
+    input.split("_")
+            .joinToString("") { it.capitalize() }
+            .decapitalize()
+}
+```
 
 ---
 
 # The arrow operator
 
 ```kotlin
+(String) -> String
 ```
 
 ---
@@ -72,26 +104,111 @@ fun main(args: Array<String>) {
 # Storing references to functions
 
 ```kotlin
+val camelCaseConverter: (String) -> String = { input ->
+    input.split("_")
+            .joinToString("") { it.capitalize() }
+            .decapitalize()
+}
 ```
 
 ---
 
-# Passing functions as arguments to other functions
+# Function type invocation
 
 ```kotlin
+fun main(args: Array<String>) {
+  val convertedString = camelCaseConverter("snake_case")
+  println(convertedString)
+}
+
+val camelCaseConverter: (String) -> String = { input ->
+    input.split("_")
+            .joinToString("") { it.capitalize() }
+            .decapitalize()
+}
 ```
 
 ---
 
-# Origins of higher-order functions
+# Passing functions as arguments
+
+```kotlin
+fun main(args: Array<String>) {
+    printFormattedText("snake_case", camelCaseConverter)
+}
+
+fun printFormattedText(text: String, 
+                      caseConverter: (String) -> String) {
+    println(caseConverter(text))
+}
+
+val camelCaseConverter: (String) -> String = { input ->
+    ...
+}
+```
+
+---
+
+# Higher-order functions in lambda calculus
+
+// TODO: Call back to lambda calculus syntax here
+
+---
+
+# Anonymous functions
+
+```kotlin
+fun main(args: Array<String>) {
+    printFormattedText("snake_case", { input ->
+        input.split("_")
+            .joinToString("") { it.capitalize() } 
+    })
+}
+```
 
 ---
 
 # Last parameter trick // Provide proper name
 
+```kotlin
+fun main(args: Array<String>) {
+    printFormattedText("snake_case") { input ->
+        input.split("_")
+                .joinToString("") { it.capitalize() }
+    }
+}
+```
+
 ---
 
 # Domain-specific languages
+
+```kotlin
+verticalLayout {
+    val name = editText()
+    button("Say Hello") {
+        onClick { toast("Hello, ${name.text}!") }
+    }
+}
+```
+
+---
+
+# Domain-specific languages
+
+```kotlin
+onClick { toast("Hello, ${name.text}!") }
+```
+
+---
+
+# Domain-specific languages
+
+```kotlin
+fun View.onClick(v: (View?) -> Unit) {
+  setOnClickListener(v)
+}
+```
 
 ---
 
@@ -99,9 +216,10 @@ fun main(args: Array<String>) {
 
 ---
 
-# Java's Function type
+# Java's FunctionN type
 
 ```java
+private static final Function1 camelCaseConverter;
 ```
 
 ---
@@ -109,6 +227,12 @@ fun main(args: Array<String>) {
 # Higher-order function in Java
 
 ```java
+public static final void printFormattedText(
+    @NotNull String text, 
+    @NotNull Function1 caseConverter) {
+  Object var2 = caseConverter.invoke(text);
+  System.out.println(var2);
+}
 ```
 
 ---
@@ -116,13 +240,9 @@ fun main(args: Array<String>) {
 # Last parameter trick in Java // rename
 
 ```java
-```
-
----
-
-# Domain-specific language in Java
-
-```java
+public static final void main(@NotNull String[] args) {
+  printFormattedText("snake_case", (Function1)null.INSTANCE);
+} // TODO: WHy is this null?
 ```
 
 ---
@@ -140,6 +260,18 @@ Fold higher-order function into call site
 * inline
 * noinline
 * crossline
+
+---
+
+# inline
+
+---
+
+# noinline
+
+---
+
+# crossinline
 
 ---
 
