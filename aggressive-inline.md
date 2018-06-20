@@ -1,5 +1,7 @@
-# Aggressive Inline
-## Higher-Order Functions in Kotlin
+build-lists: true
+
+# [fit] Aggressive Inline
+## [fit] Higher-Order Functions in Kotlin
 
 ---
 
@@ -8,12 +10,12 @@
 
 ---
 
-# Aggressive Inline
-## Higher-Order Functions in Kotlin
+# [fit] Aggressive Inline
+## [fit] Higher-Order Functions in Kotlin
 
 ---
 
-# Functions are first class citizens in Kotlin
+# [fit] Functions are first class citizens in Kotlin
 
 ---
 
@@ -39,6 +41,22 @@ fun main(args: Array<String>) {
 
 ---
 
+# Top-level declarations
+
+```kotlin
+fun main(args: Array<String>) {
+  // Do something
+}
+
+class Example {
+
+}
+
+val flexible: Boolean = true
+```
+
+---
+
 # Strings
 
 In Java:
@@ -55,7 +73,25 @@ val name: String = "Sophie"
 
 ---
 
+# Integers
+
+In Java:
+
+```java
+int count = 4
+```
+
+In Kotlin:
+
+```kotlin
+val count: Int = 4
+```
+
+---
+
 # Function types
+
+In Kotlin:
 
 ```kotlin
 val camelCaseConverter: (String) -> String = { input ->
@@ -67,29 +103,29 @@ val camelCaseConverter: (String) -> String = { input ->
 
 ---
 
-# Lambda calculus
+# [fit] Lambda calculus
 
 ---
 
 # Origins of lambda calculus
 
----
+Alonzo Church
 
-# Functions as black boxes
-
-// TODO: OmniGraffle diagram
+![right](Alonzo_Church.jpg)
 
 ---
 
-# What does lambda calculus look like in Kotlin syntax?
+# Lambda calculus
 
-```kotlin
-val camelCaseConverter: (String) -> String = { input ->
-    input.split("_")
-            .joinToString("") { it.capitalize() }
-            .decapitalize()
-}
-```
+$$
+\lambda x.y
+$$
+
+---
+
+# Function
+
+![inline](function.png)
 
 ---
 
@@ -103,7 +139,7 @@ val camelCaseConverter: (String) -> String = { input ->
 
 # Storing references to functions
 
-```kotlin
+```kotlin, [.highlight: 1, 5]
 val camelCaseConverter: (String) -> String = { input ->
     input.split("_")
             .joinToString("") { it.capitalize() }
@@ -115,7 +151,7 @@ val camelCaseConverter: (String) -> String = { input ->
 
 # Function type invocation
 
-```kotlin
+```kotlin, [.highlight: 2]
 fun main(args: Array<String>) {
   val convertedString = camelCaseConverter("snake_case")
   println(convertedString)
@@ -132,7 +168,7 @@ val camelCaseConverter: (String) -> String = { input ->
 
 # Passing functions as arguments
 
-```kotlin
+```kotlin, [.highlight: 2]
 fun main(args: Array<String>) {
     printFormattedText("snake_case", camelCaseConverter)
 }
@@ -142,16 +178,24 @@ fun printFormattedText(text: String,
     println(caseConverter(text))
 }
 
-val camelCaseConverter: (String) -> String = { input ->
-    ...
-}
+val camelCaseConverter: (String) -> String = ...
 ```
 
 ---
 
-# Higher-order functions in lambda calculus
+# Higher-order functions
 
-// TODO: Call back to lambda calculus syntax here
+$$
+f(x)
+$$ is a function
+
+$$
+g(x)
+$$ is a function
+
+$$
+f(g(x))
+$$ is an implementation of $$f(x)$$ that takes $$g(x)$$ as input
 
 ---
 
@@ -168,13 +212,13 @@ fun main(args: Array<String>) {
 
 ---
 
-# Last parameter trick // Provide proper name
+# Last parameter SAM
 
 ```kotlin
 fun main(args: Array<String>) {
     printFormattedText("snake_case") { input ->
         input.split("_")
-                .joinToString("") { it.capitalize() }
+            .joinToString("") { it.capitalize() }
     }
 }
 ```
@@ -196,8 +240,13 @@ verticalLayout {
 
 # Domain-specific languages
 
-```kotlin
-onClick { toast("Hello, ${name.text}!") }
+```kotlin, [.highlight: 4]
+verticalLayout {
+    val name = editText()
+    button("Say Hello") {
+        onClick { toast("Hello, ${name.text}!") }
+    }
+}
 ```
 
 ---
@@ -212,37 +261,102 @@ fun View.onClick(v: (View?) -> Unit) {
 
 ---
 
-# Interoperability
+# [fit] Interoperability
 
 ---
 
 # Java's FunctionN type
 
-```java
-private static final Function1 camelCaseConverter;
-```
-
----
-
-# Higher-order function in Java
+Pre-Java 8
 
 ```java
-public static final void printFormattedText(
-    @NotNull String text, 
-    @NotNull Function1 caseConverter) {
-  Object var2 = caseConverter.invoke(text);
-  System.out.println(var2);
+private static Function1<String, String> camelCaseConverter = 
+    new Function1<String, String>() {
+        @Override
+        public String invoke(String s) {
+            //...
+        }
 }
 ```
 
 ---
 
-# Last parameter trick in Java // rename
+# Java's FunctionN type
+
+Java 8+
 
 ```java
-public static final void main(@NotNull String[] args) {
-  printFormattedText("snake_case", (Function1)null.INSTANCE);
-} // TODO: WHy is this null?
+private static Function1<String, String> camelCaseConverter = 
+    (Function1<String, String>) s -> {
+        //...
+    }
+```
+
+---
+
+# Function0
+
+In Kotlin:
+
+```kotlin
+val outputTwo: () -> Int = { 2 }
+```
+
+In Java:
+
+```java
+private static Function0<Integer> outputTwo = () -> 2;
+```
+
+---
+
+# Function2
+
+In Kotlin:
+
+```kotlin
+private val logicalOr = { aBoolean: Boolean, aBoolean2: Boolean -> 
+    aBoolean || aBoolean2 
+}
+```
+
+In Java:
+
+```java
+private static Function2<Boolean, Boolean, Boolean> logicalOr = 
+    (aBoolean, aBoolean2) -> daBoolean || aBoolean2;
+```
+
+---
+
+# Higher-order functions in Java
+
+```java
+public static void main(String[] args) {
+  printFormattedText("snake_case", camelCaseConverter);
+}
+
+private static void printFormattedText(
+    String text, 
+    Function1<String, String> caseConverter) {
+  System.out.println(caseConverter.invoke(text));
+}
+```
+
+---
+
+# Last parameter SAM in Java
+
+```java, [.highlight: 2]
+public static void main(String[] args) {
+  printFormattedText("snake_case", camelCaseConverter);
+}
+
+private static void printFormattedText(
+    String text, 
+    Function1<String, String> caseConverter) {
+  System.out.println(caseConverter.invoke(text));
+}
 ```
 
 ---
@@ -265,16 +379,211 @@ Fold higher-order function into call site
 
 # inline
 
+```kotlin
+fun main(args: Array<String>) {
+  printFormattedText("snake_case") { input ->
+      input.split("_")
+          .joinToString("") { it.capitalize() }
+  }
+}
+
+fun printFormattedText(text: String, caseConverter: (String) -> String) {
+    println(caseConverter(text))
+}
+```
+
+A Function1 is allocated for caseConverter.
+
+---
+
+# inline
+
+An inlined function includes passed function contents at call site.
+
+```kotlin, [.highlight: 8]
+fun main(args: Array<String>) {
+  printFormattedText("snake_case") { input ->
+      input.split("_")
+          .joinToString("") { it.capitalize() }
+  }
+}
+
+inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
+  println(caseConverter(text))
+}
+```
+
+---
+
+# inline
+
+* Function contents inlined at call site
+* No additional allocation
+
+```kotlin, [.highlight: 9]
+fun main(args: Array<String>) {
+  printFormattedText("snake_case") { input ->
+      input.split("_")
+          .joinToString("") { it.capitalize() }
+  }
+}
+
+inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
+  println(text.split("_").joinToString("") { it.capitalize() })
+}
+```
+
+---
+
+# What's the catch?
+
+* Passed functions are closures
+* Potential errors from referencing anything inaccessible at call site
+
 ---
 
 # noinline
+
+Specify that a function should not be inlined
+
+```kotlin
+inline fun printFormattedText(
+    text: String, 
+    caseConverter: (String) -> String
+    noinline func: () -> Int) {
+  println(text.split("_")
+      .joinToString("") { it.capitalize() })
+}
+```
+
+---
+
+# noinline
+
+Specify that a function should not be inlined
+
+```kotlin, [.highlight: 1, 3-4, 7]
+inline fun printFormattedText(
+    text: String, 
+    caseConverter: (String) -> String
+    noinline func: () -> Int) {
+  println(text.split("_")
+      .joinToString("") { it.capitalize() })
+}
+```
 
 ---
 
 # crossinline
 
+Pass a function to another execution context
+
+```kotlin
+inline fun printFormattedText(
+    text: String, 
+    caseConverter: (String) -> String
+    crossinline func: () -> Int) {
+  Runnable {
+    override fun run() = func()
+  }
+}
+```
+
+---
+
+# crossinline
+
+Pass a function to another execution context
+
+```kotlin, [.highlight: 1, 3-8]
+inline fun printFormattedText(
+    text: String, 
+    caseConverter: (String) -> String
+    crossinline func: () -> Int) {
+  Runnable {
+    override fun run() = func()
+  }
+}
+```
+
+---
+
+# [fit] Improved patterns
+
+---
+
+# Callback interfaces
+
+```java
+public static void main(String[] args) {
+  EventListener listener = new EventListener() {
+      @Override
+      public void onEventOccurred() {
+        // Do something
+      }
+  };
+}
+
+interface EventListener {
+  void onEventOccurred();
+}
+```
+
+---
+
+# Callback interfaces
+
+```java
+public static void main(String[] args) {
+  EventListener listener = ...
+  
+  someFunction(listener);
+}
+
+private void someFunction(EventListener listener) {
+  ...
+}
+```
+
+---
+
+# Replacing callback interfaces
+
+```kotlin
+fun main(args: Array<String>) {
+  someFunction {
+    // Do something
+  }
+}
+
+private fun someFunction(onEventOccurred: () -> Unit) {
+  
+}
+```
+
 ---
 
 # Functional programming
 
-// todo RxJava example
+```kotlin
+val animals = listOf("zebra", "giraffe", "elephant")
+val babies = animals
+    .map { animal -> "A baby $animal" }
+    .map { baby -> "$baby, with a cute little nose!"}
+println(babies)
+```
+
+```
+A baby zebra, with a cute little nose!
+A baby giraffe, with a cute little nose!
+A baby elephant, with a cute little nose!
+```
+
+---
+
+# Higher-order functions and you
+
+* Replace your callback interfaces
+* Enable intuitive syntax
+* Be responsible about performance
+* Consider interoperability
