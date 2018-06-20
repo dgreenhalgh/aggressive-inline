@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
 
 ---
 
-# Top-level declarations
+# Top-level declarations, Kotlin
 
 ```kotlin
 fun main(args: Array<String>) {
@@ -415,11 +415,13 @@ private static Function1<String, String> camelCaseConverter = ...
 
 ---
 
-# Last parameter SAM in Java
+# Anonymous function in Java
 
-```java, [.highlight: 2]
+```java, [.highlight: 2-4]
 public static void main(String[] args) {
-  printFormattedText("snake_case", camelCaseConverter);
+  printFormattedText("snake_case", new Function1<String, String>() {
+    ...
+  });
 }
 
 private static void printFormattedText(
@@ -428,14 +430,32 @@ private static void printFormattedText(
   System.out.println(caseConverter.invoke(text));
 }
 
-private static Function1<String, String> camelCaseConverter = ...
+```
+
+---
+
+# Last parameter SAM in Java
+
+```java, [.highlight: 2-4]
+public static void main(String[] args) {
+  printFormattedText("snake_case", new Function1<String, String>() {
+    ...
+  });
+}
+
+private static void printFormattedText(
+    String text, 
+    Function1<String, String> caseConverter) {
+  System.out.println(caseConverter.invoke(text));
+}
+
 ```
 
 ---
 
 # Performance implications of function types
 
-* Additional object allocation
+* Additional object/method allocation(s)
 
 ---
 
@@ -451,6 +471,8 @@ Fold higher-order function into call site
 
 # inline
 
+A Function1 is allocated for caseConverter.
+
 ```kotlin
 fun main(args: Array<String>) {
   printFormattedText("snake_case") { input ->
@@ -464,8 +486,6 @@ fun printFormattedText(text: String, caseConverter: (String) -> String) {
   println(formattedText)
 }
 ```
-
-A Function1 is allocated for caseConverter.
 
 ---
 
@@ -495,7 +515,7 @@ inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
 * Function contents inlined at call site
 * No additional allocation
 
-```kotlin, [.highlight: 9]
+```kotlin, [.highlight: 2-5, 8-10]
 fun main(args: Array<String>) {
   printFormattedText("snake_case") { input ->
       input.split("_")
@@ -504,7 +524,8 @@ fun main(args: Array<String>) {
 }
 
 inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
-  val formattedText = text.split("_").joinToString("") { it.capitalize() }
+  val formattedText = text.split("_")
+                        .joinToString("") { it.capitalize() }
   println(formattedText)
 }
 ```
@@ -517,10 +538,12 @@ inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
 * Potential errors from referencing anything inaccessible at call site
 
 ```kotlin
-private val x = 4
+class LockBox {
+  private val secretCode = 4
+}
 
 val printPrivateValue: () -> Unit = {
-  println(x)
+  println(secretCode)
 }
 ```
 
