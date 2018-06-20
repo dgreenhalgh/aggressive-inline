@@ -137,9 +137,45 @@ $$
 
 ---
 
+# The arrow operator
+
+```kotlin
+(String) -> String
+
+"David" -> "DAVID"
+```
+
+---
+
+# input -> output
+
+```kotlin
+val camelCaseConverter: (String) -> String = { input ->
+    input.split("_")
+            .joinToString("") { it.capitalize() }
+            .decapitalize()
+}
+```
+
+---
+
+# input -> output
+
+```kotlin, [.highlight: 7]
+val camelCaseConverter: (String) -> String = { input ->
+    input.split("_")
+            .joinToString("") { it.capitalize() }
+            .decapitalize()
+}
+
+"snake_case" -> "snakeCase"
+```
+
+---
+
 # Storing references to functions
 
-```kotlin, [.highlight: 1, 5]
+```kotlin, [.highlight: 1]
 val camelCaseConverter: (String) -> String = { input ->
     input.split("_")
             .joinToString("") { it.capitalize() }
@@ -151,7 +187,7 @@ val camelCaseConverter: (String) -> String = { input ->
 
 # Function type invocation
 
-```kotlin, [.highlight: 2]
+```kotlin, [.highlight: 2, 6]
 fun main(args: Array<String>) {
   val convertedString = camelCaseConverter("snake_case")
   println(convertedString)
@@ -168,14 +204,15 @@ val camelCaseConverter: (String) -> String = { input ->
 
 # Passing functions as arguments
 
-```kotlin, [.highlight: 2]
+```kotlin, [.highlight: 2,10]
 fun main(args: Array<String>) {
-    printFormattedText("snake_case", camelCaseConverter)
+  printFormattedText("snake_case", camelCaseConverter)
 }
 
 fun printFormattedText(text: String, 
                       caseConverter: (String) -> String) {
-    println(caseConverter(text))
+  val formattedText = caseConverter(text)
+  println(formattedText)
 }
 
 val camelCaseConverter: (String) -> String = ...
@@ -196,6 +233,24 @@ $$ is a function
 $$
 f(g(x))
 $$ is an implementation of $$f(x)$$ that takes $$g(x)$$ as input
+
+---
+
+# Higher-order functions
+
+```kotlin
+fun main(args: Array<String>) {
+  printFormattedText("snake_case", camelCaseConverter)
+}
+
+fun printFormattedText(text: String, 
+                      caseConverter: (String) -> String) {
+  val formattedText = caseConverter(text)
+  println(formattedText)
+}
+
+val camelCaseConverter: (String) -> String = ...
+```
 
 ---
 
@@ -256,6 +311,19 @@ verticalLayout {
 ```kotlin
 fun View.onClick(v: (View?) -> Unit) {
   setOnClickListener(v)
+}
+```
+
+---
+
+# Domain-specific languages
+
+```kotlin
+verticalLayout {
+    val name = editText()
+    button("Say Hello") {
+        onClick { toast("Hello, ${name.text}!") }
+    }
 }
 ```
 
@@ -324,7 +392,7 @@ In Java:
 
 ```java
 private static Function2<Boolean, Boolean, Boolean> logicalOr = 
-    (aBoolean, aBoolean2) -> daBoolean || aBoolean2;
+    (aBoolean, aBoolean2) -> aBoolean || aBoolean2;
 ```
 
 ---
@@ -341,6 +409,8 @@ private static void printFormattedText(
     Function1<String, String> caseConverter) {
   System.out.println(caseConverter.invoke(text));
 }
+
+private static Function1<String, String> camelCaseConverter = ...
 ```
 
 ---
@@ -357,6 +427,8 @@ private static void printFormattedText(
     Function1<String, String> caseConverter) {
   System.out.println(caseConverter.invoke(text));
 }
+
+private static Function1<String, String> camelCaseConverter = ...
 ```
 
 ---
@@ -373,7 +445,7 @@ Fold higher-order function into call site
 
 * inline
 * noinline
-* crossline
+* crossinline
 
 ---
 
@@ -388,7 +460,8 @@ fun main(args: Array<String>) {
 }
 
 fun printFormattedText(text: String, caseConverter: (String) -> String) {
-    println(caseConverter(text))
+  val formattedText = caseConverter(text)
+  println(formattedText)
 }
 ```
 
@@ -409,11 +482,13 @@ fun main(args: Array<String>) {
 }
 
 inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
-  println(caseConverter(text))
+  val formattedText = caseConverter(text)
+  println(formattedText)
 }
 ```
 
 ---
+[.build-lists: false]
 
 # inline
 
@@ -429,7 +504,8 @@ fun main(args: Array<String>) {
 }
 
 inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
-  println(text.split("_").joinToString("") { it.capitalize() })
+  val formattedText = text.split("_").joinToString("") { it.capitalize() }
+  println(formattedText)
 }
 ```
 
@@ -439,6 +515,14 @@ inline fun printFormattedText(text: String, caseConverter: (String) -> String) {
 
 * Passed functions are closures
 * Potential errors from referencing anything inaccessible at call site
+
+```kotlin
+private val x = 4
+
+val printPrivateValue: () -> Unit = {
+  println(x)
+}
+```
 
 ---
 
@@ -451,8 +535,9 @@ inline fun printFormattedText(
     text: String, 
     caseConverter: (String) -> String
     noinline func: () -> Int) {
-  println(text.split("_")
-      .joinToString("") { it.capitalize() })
+  val formattedText = text.split("_")
+                        .joinToString("") { it.capitalize() }
+  println(formattedText)
 }
 ```
 
@@ -462,13 +547,14 @@ inline fun printFormattedText(
 
 Specify that a function should not be inlined
 
-```kotlin, [.highlight: 1, 3-4, 7]
+```kotlin, [.highlight: 1, 3-4, 8]
 inline fun printFormattedText(
     text: String, 
     caseConverter: (String) -> String
     noinline func: () -> Int) {
-  println(text.split("_")
-      .joinToString("") { it.capitalize() })
+  val formattedText = text.split("_")
+                        .joinToString("") { it.capitalize() }
+  println(formattedText)
 }
 ```
 
@@ -587,3 +673,8 @@ A baby elephant, with a cute little nose!
 * Enable intuitive syntax
 * Be responsible about performance
 * Consider interoperability
+
+---
+
+# [fit] Aggressive Inline
+## [fit] Higher-Order Functions in Kotlin
