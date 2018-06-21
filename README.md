@@ -1,2 +1,2 @@
 # aggressive-inline
-WIP presentation on higher-order functions in Kotlin
+Presentation introducing higher-order functions in Kotlin
